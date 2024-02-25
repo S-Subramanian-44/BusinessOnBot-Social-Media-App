@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .post {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .media-content {
+            margin-bottom: 10px;
+        }
+        .media-content img,
+        .media-content video {
+            max-width: 100%;
+            height: auto;
+        }
+        .post-actions {
+            margin-top: 10px;
+        }
+        .post-actions button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .post-actions button:hover {
+            background-color: #0056b3;
+        }
+        .profile-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .profile-button a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            max-width: 80%;
+            max-height: 80%;
+            overflow-y: auto; /* Enable scrolling if content exceeds modal height */
+        }
+        .modal-content button {
+            float: right;
+        }
+
+        .profile-button a:hover {
+            background-color: #0056b3;
+        }
+        .new-post-form {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .new-post-form input[type="file"] {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+        <div class="container">
+        <div class="new-post-form">
+            <h2>Create New Post</h2>
+            <form action="/create_post" method="post" enctype="multipart/form-data">
+                <label for="post_content">Content:</label><br>
+                <textarea id="post_content" name="post_content" rows="4" cols="50"></textarea><br>
+                <label for="post_media">Media (Image/Video):</label><br>
+                <input type="file" id="post_media" name="post_media" accept="image/*,video/*"><br>
+                <button type="submit">Post</button>
+            </form>
+        </div>
+        <div class="profile-button">
+            <a href="/profile">Your Profile</a>
+        </div><br>
+        {% for post in posts %}
+        <div class="post" id="post-{{ post[0] }}">
+            <p><strong>Posted by: <span id="post-{{ post[0] }}-username">{{ post[1] }}</span></strong></p> <!-- Display username directly -->
+            <div class="media-content">
+                {% if post[6] %}
+                {% if post[6].endswith(('.jpg', '.png', '.jpeg', '.gif')) %}
+                <img src="{{ post[6] }}" alt="Image">
+                {% elif post[6].endswith(('.mp4', '.mov', '.avi')) %}
+                <video controls>
+                    <source src="{{ post[6] }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                {% endif %}
+                {% endif %}
+            </div>
+            <p>{{ post[2] }}</p>
+            <p>Likes: <span id="post-{{ post[0] }}-likes">{{ post[3] }}</span> <button onclick="showLikes('{{ post[0] }}')">Show Liked Users</button></p>
+            <p>Created At: {{ post[5] }}</p>
+            <div class="post-actions">
+                <button onclick="likePost('{{ post[0] }}', '{{ post[1] }}')">Like</button>
+            </div>
+        </div>
+        <div class="profile-button">
+    <a href="#top">Home</a>
+</div>
+        {% endfor %}
+
+        
+    </div>
+
+    <script>
+        // Function to fetch and display username when page loads
+        window.onload = function() {
+            var posts = document.getElementsByClassName("post");
+            Array.from(posts).forEach(function(post) {
+                var postId = post.id.split("-")[1]; // Extract post ID from post element ID
+                var userId = document.getElementById("post-" + postId + "-username").textContent;
+                fetchUsername(userId, postId);
+            });
+        }
+
+        // Function to fetch username via AJAX
+        function fetchUsername(userId, postId) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/get_username/" + userId, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var username = JSON.parse(xhr.responseText);
+                    document.getElementById("post-" + postId + "-username").textContent = username;
+                }
+            };
+            xhr.send();
+        }
+
+        function showLikes(postId) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/get_likes/" + postId, true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    var likesList = JSON.parse(xhr.responseText);
+                    var modalOverlay = document.createElement("div");
+                    modalOverlay.classList.add("modal-overlay");
+                    var modalContent = document.createElement("div");
+                    modalContent.classList.add("modal-content");
+                    var closeButton = document.createElement("button");
+                    closeButton.textContent = "X";
+                    closeButton.addEventListener("click", function() {
+                        document.body.removeChild(modalOverlay);
+                    });
+                    modalContent.appendChild(closeButton);
+                    likesList.forEach(function (userId) {
+                        var userElement = document.createElement("p");
+                        userElement.textContent = userId;
+                        modalContent.appendChild(userElement);
+                    });
+                    modalOverlay.appendChild(modalContent);
+                    document.body.appendChild(modalOverlay);
+                }
+            };
+            xhr.send();
+        }
+
+        // Function to like a post (unchanged)
+        function likePost(postId, userId) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/toggle_like_post", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        var likesElement = document.querySelector(`#post-${postId}-likes`);
+                        var isLiked = JSON.parse(xhr.responseText).isLiked;
+                        if (isLiked) {
+                            likesElement.textContent = parseInt(likesElement.textContent) + 1;
+                        } else {
+                            likesElement.textContent = parseInt(likesElement.textContent) - 1;
+                        }
+                    } else {
+                        console.error("Failed to toggle like post.");
+                    }
+                }
+            };
+            xhr.send(JSON.stringify({ postId: postId, userId: userId }));
+        }
+    </script>
+</body>
+</html>
