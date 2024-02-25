@@ -5,13 +5,21 @@ This Flask-based social media application allows users to register, log in, crea
 ## Key Features
 
 - **User Authentication**: Users can register with unique usernames and passwords, and then log in securely to access the platform's features.
+
+![](ScreenShots/login.png)
+![](ScreenShots/Registeration.png)
   
 - **Profile Management**: Users can update their profile photos, view their own posts, and see the posts they've liked.
+
+![](ScreenShots/User%20Profile.png)
   
 - **Post Creation and Viewing**: Users can create posts with text content and optionally attach multimedia files such as images or videos. All users can view posts from other users on a centralized feed.
 
-- **Post Interaction**: Users can like posts, with like counts dynamically updating. They can also delete their own posts if needed.
+![](ScreenShots/Posts.png)
 
+- **Post Interaction**: Users can like posts, with like counts dynamically updating. They can also delete their own posts if needed.
+![](ScreenShots/Show%20Likes.png)
+![](ScreenShots/Delete%20Post.png)
 - **Multimedia Support**: The application supports various multimedia formats, including PNG, JPG, JPEG, GIF, MP4, MOV, and AVI.
 
 ## Usage
