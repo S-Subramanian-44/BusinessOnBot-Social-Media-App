@@ -37,7 +37,9 @@ This Flask-based social media application allows users to register, log in, crea
 - HTML
 - CSS
 - JavaScript
-  
+
+Video - https://drive.google.com/file/d/1uEbEOVNtAjbNmdJ_5ku2fiJHDs9OONYX/view?usp=drivesdk
+
 ## Let's Connect!
 🌐 LinkedIn: https://www.linkedin.com/in/subramanian-s-ab94302a1/ 
 📧 Email: subramanian160104@gmail.com
