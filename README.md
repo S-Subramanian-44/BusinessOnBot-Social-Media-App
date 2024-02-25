@@ -1,4 +1,4 @@
-# BusinessOnBot-Socail-media-app
+# BusinessOnBot-Socail-Media-App
 # Problem Statement
 Develop a social media application that allows users to create accounts, log in, and share posts publicly. While Node.js is the preferred backend technology, any frameworks or libraries you are comfortable with can be used. Similarly, Angular is the preferred choice for the frontend, but you can use any frameworks or libraries that suit your preferences. Key features should include user authentication, profile management, post creation, search users and a responsive design optimized for various devices. All users, posts, and profile information needs to be stored in a database, whether it's SQL or NoSQL. To make it accessible to users, both frontend and backend components need to be deployed.
 
